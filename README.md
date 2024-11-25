@@ -52,6 +52,7 @@ o	Risk of generic or irrelevant advice if the system fails to adapt to diverse e
 6.	Usability:
 o	Balancing simplicity for non-technical users with advanced options for detailed customization.
 o	Risk of overwhelming users with too many features or unclear navigation.
+________________________________________________________________________________________
 Deliverables
 1.	User-Friendly Interface:
 o	A clean, intuitive, and accessible user interface that allows seamless interaction with Furhat, suitable for both technical and non-technical users.
