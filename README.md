@@ -71,8 +71,8 @@ o	Implement a memory system where Furhat can recognize returning users, recall p
 o	A system that integrates real-time emotional input (via webcam and audio) with adaptive conversation, demonstrating smooth and timely responses.
 8.	Comprehensive Documentation and Presentation:
 o	Include written documentation describing:
-	Technical details of the User Perception and Interaction subsystems.
-	How the system detects emotions and generates responses.
-	Ethical considerations for user memory and privacy.
+- Technical details of the User Perception and Interaction subsystems.
+-	How the system detects emotions and generates responses.
+-	Ethical considerations for user memory and privacy.
 o	Deliver a final presentation showcasing Furhat’s functionality, user interaction scenarios, and real-world applications.
 
