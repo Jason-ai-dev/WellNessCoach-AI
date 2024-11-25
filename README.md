@@ -7,6 +7,9 @@ Barath Chandra,Jason El Ghorayeb, Simon Pislar, Supun Madusanka
 Date:
 17 January 2025
 
+Elevator Pitch:
+Pete is a socially adaptive virtual robot that detects and responds to human emotions in real-time, using facial expressions and voice tone. It engages users in meaningful conversations, offering personalized advice on fitness, mental health, lifestyle, and meals based on their emotional state. With multi-user support and the ability to remember past interactions, Furhat provides a unique, empathetic, and dynamic experience that helps users maintain their well-being while fostering long-term, personalized relationships.
+
 Objectives (High-Level Goals)
 1.	Emotion Detection Capability:
 Develop an intelligent system to detect and interpret users’ emotions based on voice tone and facial expressions with a focus on accuracy and responsiveness.
