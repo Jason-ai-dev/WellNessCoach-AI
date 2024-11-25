@@ -2,7 +2,7 @@ Project Title:
 Pete: A Mindful Companion
 
 Authors:
-Simon Pislar, Supun Madusanka, Barath Chandra, Jason El Ghorayeb
+Barath Chandra,Jason El Ghorayeb, Simon Pislar, Supun Madusanka
 
 Date:
 17 January 2025
