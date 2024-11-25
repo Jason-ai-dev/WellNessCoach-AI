@@ -85,62 +85,62 @@ ________________________________________
 1. Initial Planning & Research
 Deadline: [Date]
 Responsible Members: Simon Pislar, Supun Madusanka, Barath Chandra, Jason El Ghorayeb
-•	Finalize project scope, goals, and deliverables.
-•	Research emotion detection techniques (facial expressions, voice tone).
-•	Review MultiEmoVA and DiffusionFER datasets and choose appropriate one for the emotion detection system.
-•	Research tools and frameworks needed for Furhat's interaction subsystem (Py-Feat, machine learning models, etc.).
+-	Finalize project scope, goals, and deliverables.
+- Research emotion detection techniques (facial expressions, voice tone).
+-	Review MultiEmoVA and DiffusionFER datasets and choose appropriate one for the emotion detection system.
+-	Research tools and frameworks needed for Furhat's interaction subsystem (Py-Feat, machine learning models, etc.).
 ________________________________________
 2. User Interface Design
 Deadline: [Date]
 Responsible Members: Simon Pislar, Jason El Ghorayeb
-•	Design the basic UI layout for Furhat’s interaction, focusing on accessibility and simplicity.
-•	Implement initial front-end for interaction (e.g., buttons, user input fields).
-•	Ensure compatibility with Furhat's hardware and speech synthesis system.
+-	Design the basic UI layout for Furhat’s interaction, focusing on accessibility and simplicity.
+-	Implement initial front-end for interaction (e.g., buttons, user input fields).
+-	Ensure compatibility with Furhat's hardware and speech synthesis system.
 ________________________________________
 3. Emotion Detection Subsystem Development
 Deadline: [Date]
 Responsible Members: Supun Madusanka, Barath Chandra
-•	Implement emotion detection using facial expression analysis (Py-Feat).
-•	Train machine learning models using the chosen dataset (MultiEmoVA or DiffusionFER).
-•	Test and fine-tune emotion recognition accuracy with real-time webcam input.
+-	Implement emotion detection using facial expression analysis (Py-Feat).
+-	Train machine learning models using the chosen dataset (MultiEmoVA or DiffusionFER).
+-	Test and fine-tune emotion recognition accuracy with real-time webcam input.
 ________________________________________
 4. Multi-user Interaction Testing & Enhancement
 Deadline: [Date]
 Responsible Members: Simon Pislar, Jason El Ghorayeb
-•	Develop the logic for detecting and processing emotional states from two or more users simultaneously.
-•	Test the system with multiple users, ensuring correct detection and response.
+-	Develop the logic for detecting and processing emotional states from two or more users simultaneously.
+-	Test the system with multiple users, ensuring correct detection and response.
 ________________________________________
 5. Adaptive Behavior and Conversation Design
 Deadline: [Date]
 Responsible Members: Supun Madusanka, Barath Chandra
-•	Design and implement rule-based responses that adjust based on detected emotions.
-•	Develop conversational strategies for offering wellness advice (fitness, mental health, etc.).
-•	Integrate emotional context into the conversation flow to ensure relevancy.
+-	Design and implement rule-based responses that adjust based on detected emotions.
+-	Develop conversational strategies for offering wellness advice (fitness, mental health, etc.).
+-	Integrate emotional context into the conversation flow to ensure relevancy.
 ________________________________________
 6. Memory System Development
 Deadline: [Date]
 Responsible Members: Simon Pislar, Jason El Ghorayeb
-•	Design and implement a memory function that tracks and recalls previous user interactions.
-•	Ensure privacy and ethical considerations regarding user data storage.
-•	Test the memory feature for accurate user recognition and dialogue adaptation.
+-	Design and implement a memory function that tracks and recalls previous user interactions.
+-	Ensure privacy and ethical considerations regarding user data storage.
+-	Test the memory feature for accurate user recognition and dialogue adaptation.
 ________________________________________
 7. System Integration & Testing
 Deadline: [Date]
 Responsible Members: All Members
-•	Integrate emotion detection subsystem, adaptive behavior system, and memory functionality.
-•	Conduct comprehensive system testing to ensure smooth user interaction.
-•	Perform real-time testing of the system with multiple users.
+-	Integrate emotion detection subsystem, adaptive behavior system, and memory functionality.
+-	Conduct comprehensive system testing to ensure smooth user interaction.
+-	Perform real-time testing of the system with multiple users.
 ________________________________________
 8. Documentation & Presentation Preparation
 Deadline: [Date]
 Responsible Members: All Members
-•	Prepare a technical report documenting the design, implementation, and testing processes.
-•	Create a final presentation showcasing the system, highlighting its capabilities, real-world use cases, and challenges.
-•	Include privacy and ethical considerations in the report.
+-	Prepare a technical report documenting the design, implementation, and testing processes.
+-	Create a final presentation showcasing the system, highlighting its capabilities, real-world use cases, and challenges.
+-	Include privacy and ethical considerations in the report.
 ________________________________________
 9. Final Presentation & Report Submission
 Deadline: [Course Date]
 Responsible Members: All Members
-•	Present the final project demo and findings to the course instructors or peers.
-•	Submit the final report detailing all subsystems, design decisions, and challenges encountered.
+-	Present the final project demo and findings to the course instructors or peers.
+-	Submit the final report detailing all subsystems, design decisions, and challenges encountered.
 
