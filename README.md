@@ -1,5 +1,5 @@
 Project Title:
-Furhat: A Mindful Companion
+Pete: A Mindful Companion
 
 Authors:
 Simon Pislar, Supun Madusanka, Barath Chandra, Jason El Ghorayeb
