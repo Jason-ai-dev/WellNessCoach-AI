@@ -56,9 +56,8 @@ def main():
                             w, h = x2 - x1, y2 - y1  # Compute width and height
                             x, y = x1, y1  # Top-left corner
 
-                            # Extract and preprocess the face region
                             face_region = frame[y:y + h, x:x + w]
-                            if face_region.size == 0:  # Ensure valid face region
+                            if face_region.size == 0:
                                 print("Empty face region detected. Skipping...")
                                 continue
 
