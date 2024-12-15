@@ -19,7 +19,6 @@ TEMP_DIR = "temp_unzipped"
 
 # TODO: Terrible at detecting angry, disgusted, sad and sometimes fear. Tune the model in order to fix this.
 
-# Step 1: Extract ZIP files
 def extract_zips(dataset_dir, temp_dir):
     """
     Extract all ZIP files in the dataset directory to a temporary directory.
@@ -57,14 +56,8 @@ def extract_zips(dataset_dir, temp_dir):
     return temp_dir
 
 
-
-# Step 2: Load Dataset Information
 def load_dataset_info(csv_path, temp_dir):
-    """
-    Load the CSV file and correct image paths to point to the unzipped files.
-    """
     data = pd.read_csv(csv_path)
-    # Correct file paths based on unzipped directories
     image_paths = data["subDirectory_filePath"].apply(
         lambda x: os.path.join(temp_dir, x.replace("DiffusionEmotion_S_cropped/", ""))
     )
@@ -72,7 +65,6 @@ def load_dataset_info(csv_path, temp_dir):
     return image_paths, labels
 
 
-# Step 3: Load and Preprocess Images
 def load_and_preprocess_images(image_paths, labels, target_size=(48, 48)):
     """
     Load images, convert to grayscale, resize, flatten, and balance classes with oversampling.
@@ -88,14 +80,14 @@ def load_and_preprocess_images(image_paths, labels, target_size=(48, 48)):
                 images.append(resized_image.flatten())
                 valid_indices.append(idx)
             else:
-                print(f"Warning: Unable to read image {img_path}")
+                print(f"Warning: Unable to read image {img_path}") # For debugging
         else:
-            print(f"Warning: File not found {img_path}")
+            print(f"Warning: File not found {img_path}") # For debugging
 
     X = np.array(images)
     y = labels.iloc[valid_indices].values
 
-    # Balance classes through oversampling
+    # Balance classes through oversampling (found on Google and chatgpt, not sure how it works to be honest. Might be stupid code hahah)
     X_balanced, y_balanced = [], []
     unique_classes = np.unique(y)
     max_samples = max(np.bincount(y))
@@ -116,8 +108,7 @@ def load_and_preprocess_images(image_paths, labels, target_size=(48, 48)):
     return X_balanced, y_balanced
 
 
-
-# Step 4: Combine Features and Train the Model
+# Combine Features and Train the Model
 def train_model(X, y):
     """
     Train a Random Forest model on the given data.
@@ -139,7 +130,6 @@ def train_model(X, y):
     return rf_model, scaler
 
 
-# Step 5: Main Function
 def main():
     print("Extracting ZIP files...")
     temp_dir = extract_zips(DATASET_DIR, TEMP_DIR)
