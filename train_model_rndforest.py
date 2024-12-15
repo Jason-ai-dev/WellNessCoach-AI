@@ -17,6 +17,7 @@ CSV_PATH = "DiffusionFER/DiffusionEmotion_S/dataset_sheet.csv"
 DATASET_DIR = "DiffusionFER/DiffusionEmotion_S/cropped"
 TEMP_DIR = "temp_unzipped"
 
+# TODO: Terrible at detecting angry, disgusted, sad and sometimes fear. Tune the model in order to fix this.
 
 # Step 1: Extract ZIP files
 def extract_zips(dataset_dir, temp_dir):
