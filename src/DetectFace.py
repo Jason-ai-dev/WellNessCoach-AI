@@ -2,13 +2,12 @@ import numpy as np
 import pandas as pd
 import cv2
 import joblib
-from feat import Detector  # Retained for face and landmark detection
-from feat.utils import FEAT_EMOTION_COLUMNS
+from feat import Detector
 
 SCALER_PATH = "../scaler.pkl"
 MODEL_PATH = "../rf_model.pkl"
-scaler = joblib.load(SCALER_PATH)  # Load your custom scaler
-model = joblib.load(MODEL_PATH)  # Load your trained RandomForest model
+scaler = joblib.load(SCALER_PATH)
+model = joblib.load(MODEL_PATH)
 
 EMOTIONS = ["neutral", "happy", "angry", "disgust", "fear", "sad", "surprise"]
 
@@ -25,7 +24,7 @@ class MyDetectFace():
             face_model='faceboxes',
             landmark_model="pfld",
             au_model='svm',
-            device='cpu'  # Force PyFeat to use CPU
+            device='cpu' # Encountered a few errors when trying to use GPU, feel free to switch to GPU if you want
         )
 
         au_names = self._detector.info['au_presence_columns']
@@ -60,19 +59,16 @@ class MyDetectFace():
         faces = self._detector.detect_faces(self._myImg)
         landmarks = self._detector.detect_landmarks(self._myImg, faces)
 
-        # Check for detected faces
         if len(faces) == 0:
             print("No faces detected.")
             return
 
         f_index = 0
         for face_coords in faces[0]:
-            # Preprocess the face and predict emotion
             face_data = self.preprocess_face(self._myImg, face_coords)
             face_data_scaled = scaler.transform([face_data])  # Apply scaling
             predicted_emotion = model.predict(face_data_scaled)[0]  # Predict emotion
 
-            # Draw bounding box and label
             (x0, y0, x1, y1, p) = face_coords
             cv2.rectangle(self._myLabledImg, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 3)
             emotion_text = EMOTIONS[predicted_emotion]
@@ -111,7 +107,6 @@ class MyDetectFace():
                 return "", ()
 
             for face_coords in faces[0]:
-                # Preprocess face and predict emotion
                 face_data = self.preprocess_face(frame, face_coords)
                 face_data_scaled = scaler.transform([face_data])
                 predicted_emotion = model.predict(face_data_scaled)[0]
