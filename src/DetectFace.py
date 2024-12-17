@@ -1,104 +1,123 @@
 import numpy as np
 import pandas as pd
 import cv2
-from feat import Detector
+import joblib
+from feat import Detector  # Retained for face and landmark detection
 from feat.utils import FEAT_EMOTION_COLUMNS
 
-class MyDetectFace():
+SCALER_PATH = "../scaler.pkl"
+MODEL_PATH = "../rf_model.pkl"
+scaler = joblib.load(SCALER_PATH)  # Load your custom scaler
+model = joblib.load(MODEL_PATH)  # Load your trained RandomForest model
 
-    _myImg:np.ndarray 
-    _myLabledImg:np.ndarray 
-    _predDone:bool
-    _au:pd.DataFrame
-    _fname:str
-    
-    
+EMOTIONS = ["neutral", "happy", "angry", "disgust", "fear", "sad", "surprise"]
+
+
+class MyDetectFace():
+    _myImg: np.ndarray
+    _myLabledImg: np.ndarray
+    _predDone: bool
+    _au: pd.DataFrame
+    _fname: str
 
     def __init__(self):
-        # self._detector = Detector(device="auto")
-        self._detector = Detector(face_model='faceboxes',emotion_model='resmasknet', landmark_model="pfld", au_model='svm', device='auto')
-        # self._detector = Detector(face_model='retinaface',emotion_model='svm', landmark_model="mobilenet", au_model='svm', device='auto')
+        self._detector = Detector(
+            face_model='faceboxes',
+            landmark_model="pfld",
+            au_model='svm',
+            device='cpu'  # Force PyFeat to use CPU
+        )
+
         au_names = self._detector.info['au_presence_columns']
         au_names.insert(0, 'face')
         au_names.insert(0, 'file')
         self._au = pd.DataFrame(columns=au_names)
-        return
 
-    def getImg(self)->np.ndarray:
+    def getImg(self) -> np.ndarray:
         return self._myImg
-    
-    def getAUs(self)->pd.DataFrame:
+
+    def getAUs(self) -> pd.DataFrame:
         return self._au
 
-    def setImg(self, img:np.ndarray, fname:str)->None:
+    def setImg(self, img: np.ndarray, fname: str) -> None:
         self._myImg = img
-        self._myLabledImg = img
+        self._myLabledImg = img.copy()
         self._predDone = False
         self._fname = fname
         return
 
-    def predImg(self)->None:
+    def preprocess_face(self, img: np.ndarray, face_coords: tuple) -> np.ndarray:
+        """
+        Extract, preprocess, and resize the face region for model prediction.
+        """
+        x0, y0, x1, y1, _ = face_coords
+        face_region = img[int(y0):int(y1), int(x0):int(x1)]  # Crop face
+        gray_face = cv2.cvtColor(face_region, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
+        resized_face = cv2.resize(gray_face, (48, 48))  # Resize to 48x48
+        return resized_face.flatten()
+
+    def predImg(self) -> None:
         faces = self._detector.detect_faces(self._myImg)
         landmarks = self._detector.detect_landmarks(self._myImg, faces)
-        emotions = self._detector.detect_emotions(self._myImg, faces, landmarks)
-        au = self._detector.detect_aus(self._myImg, landmarks=landmarks)
 
-        # The functions seem to assume a collection of images or frames. We acces "frame 0".
-        faces = faces[0]
-        landmarks = landmarks[0]
-        emotions = emotions[0]
+        # Check for detected faces
+        if len(faces) == 0:
+            print("No faces detected.")
+            return
 
-        strongest_emotion = emotions.argmax(axis=1)
         f_index = 0
-        for (face, top_emo, iau) in zip(faces, strongest_emotion, au[0]):
-            (x0, y0, x1, y1, p) = face
+        for face_coords in faces[0]:
+            # Preprocess the face and predict emotion
+            face_data = self.preprocess_face(self._myImg, face_coords)
+            face_data_scaled = scaler.transform([face_data])  # Apply scaling
+            predicted_emotion = model.predict(face_data_scaled)[0]  # Predict emotion
+
+            # Draw bounding box and label
+            (x0, y0, x1, y1, p) = face_coords
             cv2.rectangle(self._myLabledImg, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 3)
-            cv2.putText(self._myLabledImg, FEAT_EMOTION_COLUMNS[top_emo], (int(x0), int(y0 - 10)), cv2.FONT_HERSHEY_PLAIN, 1.5, (255, 0, 0), 2)
-            iau = iau.tolist()
-            iau.insert(0, f_index)
-            iau.insert(0, self._fname.split('.')[0])
-            f_index+=1
-            self._au.loc[len(self._au)] = iau
+            emotion_text = EMOTIONS[predicted_emotion]
+            cv2.putText(self._myLabledImg, emotion_text, (int(x0), int(y0 - 10)),
+                        cv2.FONT_HERSHEY_PLAIN, 1.5, (255, 0, 0), 2)
+            f_index += 1
 
         self._predDone = True
         return
 
-    def getLableImg(self)->np.ndarray:
-        if(self._predDone):
+    def getLableImg(self) -> np.ndarray:
+        if self._predDone:
             return self._myLabledImg
         else:
             return None
-        
-    def getUserEmotion(self) -> str|tuple:
+
+    def getUserEmotion(self) -> str | tuple:
         cam = cv2.VideoCapture(0)
         cam.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         emo = ""
-        face_loc = ()
         try:
-
             ret, frame = cam.read()
+
+            # Needed because the first cam.read() call doesnt seems to get a frame good enough that a face can be found
+            # Might be because the first frame is black or something
+            for i in range(5):
+                ret, frame = cam.read()
+
             if not ret:
                 print("OpenCV found an error reading the next frame.")
+                return "", ()
 
             faces = self._detector.detect_faces(frame)
-            landmarks = self._detector.detect_landmarks(frame, faces)
-            emotions = self._detector.detect_emotions(frame, faces, landmarks)
+            if len(faces) == 0:
+                print("No faces detected.")
+                return "", ()
 
-            # The functions seem to assume a collection of images or frames. We acces "frame 0".
-            faces = faces[0]
-            landmarks = landmarks[0]
-            emotions = emotions[0]
-
-            strongest_emotion = emotions.argmax(axis=1)
-
-            for (face, top_emo) in zip(faces, strongest_emotion):
-                (x0, y0, x1, y1, p) = face
-                cv2.rectangle(frame, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 3)
-                cv2.putText(frame, FEAT_EMOTION_COLUMNS[top_emo], (int(x0), int(y0 - 10)), cv2.FONT_HERSHEY_PLAIN, 1.5, (255, 0, 0), 2)
-
-            emo = FEAT_EMOTION_COLUMNS[top_emo]
-            face_loc = (int((x0+x1)/2), int((y0+y1)/2))
+            for face_coords in faces[0]:
+                # Preprocess face and predict emotion
+                face_data = self.preprocess_face(frame, face_coords)
+                face_data_scaled = scaler.transform([face_data])
+                predicted_emotion = model.predict(face_data_scaled)[0]
+                emo = EMOTIONS[predicted_emotion]
+                break  # Process only the first detected face
 
         finally:
             cam.release()
-            return emo, face_loc
+            return emo

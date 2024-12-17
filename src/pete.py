@@ -2,7 +2,7 @@ from furhat_remote_api import FurhatRemoteAPI
 import google.generativeai as genai
 from DetectFace import MyDetectFace
 
-genai.configure(api_key="")
+genai.configure(api_key="AIzaSyDURXWXiSLgvLIYxdOC-1_1LlXt17bjLt0")
 model = genai.GenerativeModel("gemini-1.5-flash")
 chat = model.start_chat()
 
@@ -36,7 +36,7 @@ while(True):
 
     # Check if listening was successful
     if response.success and response.message:
-        emo, face = mdf.getUserEmotion()
+        emo = mdf.getUserEmotion()
         user_r = f'User looks {emo} and user says {response.message}' 
         print("User req:", user_r)
         llm_r = chat.send_message(user_r)
