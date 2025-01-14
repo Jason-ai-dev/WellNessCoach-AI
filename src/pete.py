@@ -15,7 +15,7 @@ expert_prompt = (
 "Limit each response to a minimum of 100 words and a maximum of 200 words. ")
 
 furhat = FurhatRemoteAPI("localhost")
-gem_key = ""
+gem_key = "AIzaSyCrUvfeeZ0pu2Vy6idPrxmm0vGZGtTLOT8"
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename='pete.log', level=logging.INFO)
 
