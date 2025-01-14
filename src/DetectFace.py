@@ -4,8 +4,8 @@ import cv2
 import joblib
 from feat import Detector
 
-SCALER_PATH = "../scaler.pkl"
-MODEL_PATH = "../rf_model.pkl"
+SCALER_PATH = "C://Users//jason//Documents//Uppsala University Courses//Intelligent Interactive Systems//Final Project//Bartender-AI//scaler.pkl"
+MODEL_PATH = "C://Users//jason//Documents//Uppsala University Courses//Intelligent Interactive Systems//Final Project//Bartender-AI//rf_model.pkl"
 scaler = joblib.load(SCALER_PATH)
 model = joblib.load(MODEL_PATH)
 
