@@ -12,10 +12,10 @@ expert_prompt = (
 "You are supposed to good at dealing with mental health challenges"
 "You should base your responses on psychological principles and practical solutions. "
 "Read and understand the users' questions, write responses at high levels of empathic understanding. "
-"Limit each response to a minimum of 100 words and a maximum of 200 words. ")
+"Limit each response to a minimum of 10 words and a maximum of 100 words. ")
 
 furhat = FurhatRemoteAPI("localhost")
-gem_key = ""
+gem_key = "AIzaSyDVndm7YX833QdAR2TQDSDeExtwuZnsHWs"
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename='pete.log', level=logging.INFO)
 
@@ -45,8 +45,10 @@ if __name__ == '__main__':
     # Set the voice of the robot
     furhat.set_voice(name='Joanna')
 
-    # Have Furhat greet the user
-    furhat.say(text="hi", blocking=True)
+    # Set attendence
+    users = furhat.get_users()
+    furhat.attend(user="CLOSEST")
+
 
     q = Queue()
     p_listen = Process(target=peteListen, args=(q,))

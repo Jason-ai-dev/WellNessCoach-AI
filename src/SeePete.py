@@ -5,8 +5,10 @@ from feat.utils import FEAT_EMOTION_COLUMNS
 from furhat_remote_api import FurhatRemoteAPI
 from multiprocessing import Queue
 
+
 class SeePete():
 
+    DEPTH_PARAM = 0.3
 
     def __init__(self, logger):
         # self._detector = Detector(device="auto")
@@ -18,6 +20,7 @@ class SeePete():
         self._peteSee = FurhatRemoteAPI("localhost")
         self._log = logger
         self._log.info("Starting SeePete")
+
         return
     
     def observeUser(self, queue:Queue, pete:FurhatRemoteAPI) -> None:
@@ -45,17 +48,17 @@ class SeePete():
 
                 for (face, top_emo) in zip(faces, strongest_emotion):
                     (x0, y0, x1, y1, p) = face
-                    cv2.rectangle(frame, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 3)
-                    cv2.putText(frame, FEAT_EMOTION_COLUMNS[top_emo], (int(x0), int(y0 - 10)), cv2.FONT_HERSHEY_PLAIN, 1.5, (255, 0, 0), 2)
-                
+                    
                 face_loc = ((cam.get(cv2.CAP_PROP_FRAME_WIDTH)/2-(x0+x1)/2)/cam.get(cv2.CAP_PROP_FRAME_WIDTH), 
-                                (cam.get(cv2.CAP_PROP_FRAME_HEIGHT)/2-(y0+y1)/2)/cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                pete.attend(location=f"{face_loc[0]},{face_loc[1]},1.0")
+                                (cam.get(cv2.CAP_PROP_FRAME_HEIGHT)/2-(y0+y1)/2)/cam.get(cv2.CAP_PROP_FRAME_HEIGHT),
+                                self.DEPTH_PARAM*cam.get(cv2.CAP_PROP_FRAME_HEIGHT)/(max((abs(y1-y0), 0.01,))))
+                self._log.info(f"looking at: {face_loc}")
+                pete.attend(location=f"{face_loc[0]},{face_loc[1]},{face_loc[2]}")
                 if((emo != FEAT_EMOTION_COLUMNS[top_emo]) and (emo != "") and (FEAT_EMOTION_COLUMNS[top_emo] != old_emo)):
                     old_emo = emo
                     queue.put(f"emotion|>{emo}->{FEAT_EMOTION_COLUMNS[top_emo]}")
                 emo = FEAT_EMOTION_COLUMNS[top_emo]
-                time.sleep(2)
+                time.sleep(10)
             except AttributeError:
                 continue
 
