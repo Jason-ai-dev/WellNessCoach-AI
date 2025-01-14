@@ -10,7 +10,7 @@ class SeePete():
 
     def __init__(self, logger):
         # self._detector = Detector(device="auto")
-        self._detector = Detector(face_model='faceboxes',emotion_model='resmasknet', landmark_model="pfld", au_model='svm', device='auto')
+        self._detector = Detector(face_model='faceboxes',emotion_model='resmasknet', landmark_model="pfld", au_model='svm', device='cpu')
         # self._detector = Detector(face_model='retinaface',emotion_model='svm', landmark_model="mobilenet", au_model='svm', device='auto')
         au_names = self._detector.info['au_presence_columns']
         au_names.insert(0, 'face')
@@ -55,7 +55,7 @@ class SeePete():
                     old_emo = emo
                     queue.put(f"emotion|>{emo}->{FEAT_EMOTION_COLUMNS[top_emo]}")
                 emo = FEAT_EMOTION_COLUMNS[top_emo]
-                time.sleep(2)
+                time.sleep(30)
             except AttributeError:
                 continue
 

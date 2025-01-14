@@ -12,7 +12,7 @@ expert_prompt = (
 "You are supposed to good at dealing with mental health challenges"
 "You should base your responses on psychological principles and practical solutions. "
 "Read and understand the users' questions, write responses at high levels of empathic understanding. "
-"Limit each response to a minimum of 100 words and a maximum of 200 words. ")
+"Limit each response to a minimum of 1 word and a maximum of 50 words. ")
 
 furhat = FurhatRemoteAPI("localhost")
 gem_key = "AIzaSyCrUvfeeZ0pu2Vy6idPrxmm0vGZGtTLOT8"
@@ -40,13 +40,14 @@ if __name__ == '__main__':
     voices = furhat.get_voices()
 
     # Select a character for the virtual Furhat
-    furhat.set_face(character="Isabel", mask="adult")
+    furhat.set_face(character="James", mask="adult")
 
     # Set the voice of the robot
-    furhat.set_voice(name='Joanna')
+    furhat.set_voice(name='Matthew')
 
     # Have Furhat greet the user
-    furhat.say(text="hi", blocking=True)
+    furhat.say(text="Hey, how are you?", blocking=True)
+    
 
     q = Queue()
     p_listen = Process(target=peteListen, args=(q,))

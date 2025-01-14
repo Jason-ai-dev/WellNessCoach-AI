@@ -13,8 +13,8 @@ import joblib
 import shutil  # For cleaning up temporary directories
 
 # Define paths
-CSV_PATH = "DiffusionFER/DiffusionEmotion_S/dataset_sheet.csv"
-DATASET_DIR = "DiffusionFER/DiffusionEmotion_S/cropped"
+CSV_PATH = "C://Users//jason//Documents//Uppsala University Courses//Intelligent Interactive Systems//Training Data//DiffusionFER//DiffusionEmotion_S//dataset_sheet.csv"
+DATASET_DIR = "C://Users//jason//Documents//Uppsala University Courses//Intelligent Interactive Systems//Training Data//DiffusionFER//DiffusionEmotion_S//cropped"
 TEMP_DIR = "temp_unzipped"
 
 # TODO: Terrible at detecting angry, disgusted, sad and sometimes fear. Tune the model in order to fix this.
