@@ -13,8 +13,9 @@ import joblib
 import shutil  # For cleaning up temporary directories
 
 # Define paths
-CSV_PATH = "DiffusionFER/DiffusionEmotion_S/dataset_sheet.csv"
-DATASET_DIR = "DiffusionFER/DiffusionEmotion_S/cropped"
+CSV_PATH = "C://Users//jason//Documents//Uppsala University Courses//Intelligent Interactive Systems//Training Data//DiffusionFER//DiffusionEmotion_S//dataset_sheet.csv"
+DATASET_DIR = "C://Users//jason//Documents//Uppsala University Courses//Intelligent Interactive Systems//Training Data//DiffusionFER//DiffusionEmotion_S//cropped"
+COMP_DIR = "C://Users//jason//Documents//Uppsala University Courses//Intelligent Interactive Systems//Training Data//test"
 TEMP_DIR = "temp_unzipped"
 
 # TODO: Terrible at detecting angry, disgusted, sad and sometimes fear. Tune the model in order to fix this.
@@ -129,6 +130,89 @@ def train_model(X, y):
 
     return rf_model, scaler
 
+def process_unzipped_data(comp_dir, target_size=(48, 48)):
+    """
+    Process unzipped images in the given directory for model testing.
+    - comp_dir: Path to the directory containing unzipped image folders.
+    - target_size: The size to which images will be resized.
+    """
+    test_images = []
+    test_image_paths = []
+
+    # Traverse the directory structure to load images
+    for root, _, files in os.walk(comp_dir):
+        for file in files:
+            if file.endswith((".png", ".jpg", ".jpeg")):
+                img_path = os.path.join(root, file)
+                image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+                if image is not None:
+                    resized_image = cv2.resize(image, target_size)
+                    test_images.append(resized_image.flatten())
+                    test_image_paths.append(img_path)
+                else:
+                    print(f"Warning: Unable to read image {img_path}")
+
+    if len(test_images) == 0:
+        raise ValueError("No valid images found in the test dataset.")
+
+    X_test = np.array(test_images)
+    return X_test, test_image_paths
+
+def test_model_on_unzipped_data(model_path, scaler_path, comp_dir, target_size=(48, 48)):
+    """
+    Test the trained model on a dataset with unzipped image folders.
+    """
+    # Label mapping
+    label_mapping = {
+        0: "neutral",
+        1: "happy",
+        2: "sad",
+        3: "surprise",
+        4: "fear",
+        5: "disgust",
+        6: "angry"
+    }
+
+    # Load the trained model and scaler
+    model = joblib.load(model_path)
+    scaler = joblib.load(scaler_path)
+
+    print("Processing unzipped data...")
+    X_test, test_image_paths = process_unzipped_data(comp_dir, target_size)
+
+    # Extract true labels from folder names
+    true_labels = [os.path.basename(os.path.dirname(path)) for path in test_image_paths]
+
+    # Scale the test data
+    X_test_scaled = scaler.transform(X_test)
+
+    # Make predictions
+    y_pred = model.predict(X_test_scaled)
+
+    # Map numeric predictions to emotion names
+    y_pred_mapped = [label_mapping[pred] for pred in y_pred]
+
+    # Ensure true labels and predictions are of the same type
+    true_labels = np.array(true_labels, dtype=str)
+    y_pred_mapped = np.array(y_pred_mapped, dtype=str)
+
+    # Generate a classification report
+    report = classification_report(true_labels, y_pred_mapped, zero_division=0, output_dict=True)
+    print("Classification Report:\n", report)
+
+    # Save predictions and true labels
+    predictions = pd.DataFrame({
+        "FilePath": test_image_paths,
+        "TrueLabel": true_labels,
+        "PredictedLabel": y_pred_mapped
+    })
+    print("Predictions on new dataset:\n", predictions)
+
+    predictions.to_csv("predictions.csv", index=False)
+    print("Predictions saved to predictions.csv.")
+
+    return predictions
+
 
 def main():
     print("Extracting ZIP files...")
@@ -160,6 +244,9 @@ def main():
     shutil.rmtree(temp_dir)
     print("Temporary files cleaned up.")
 
+    # Test the model on the new dataset
+    print("Testing the trained model on a new dataset...")
+    test_model_on_unzipped_data("rf_model.pkl", "scaler.pkl", COMP_DIR)
 
 if __name__ == "__main__":
     main()
