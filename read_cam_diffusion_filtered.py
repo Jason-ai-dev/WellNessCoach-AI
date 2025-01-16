@@ -6,8 +6,8 @@ import os
 import time
 
 TEMP_IMAGE_PATH = "temp_frame.jpg"
-MODEL_FILE = "Models/svc_model_no_fear_disgust.pkl"
-SCALER_FILE = "Models/scaler_no_fear_disgust.pkl"
+MODEL_FILE = "Models/svc_model_no_fear_disgust_diffusionFER.pkl"
+SCALER_FILE = "Models/scaler_no_fear_disgust_diffusionFER.pkl"
 
 print("Loading model and scaler...")
 model = joblib.load(MODEL_FILE)
