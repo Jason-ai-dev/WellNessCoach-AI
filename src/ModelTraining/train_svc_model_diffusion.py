@@ -9,8 +9,8 @@ from scipy.stats import uniform
 import joblib
 
 FILTERED_CSV_FILE = "../../AU/diffusionFER_aus_no_fear_disgust.csv"
-MODEL_FILE = "../../Models/svc_model_no_fear_disgust.pkl"
-SCALER_FILE = "../../Models/scaler_no_fear_disgust.pkl"
+MODEL_FILE = "../../Models/svc_model_no_fear_disgust_diffusionFER.pkl"
+SCALER_FILE = "../../Models/scaler_no_fear_disgust_diffusionFER.pkl"
 
 LABEL_MAP = {
     "angry": 0,

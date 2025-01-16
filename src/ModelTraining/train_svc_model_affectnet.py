@@ -30,7 +30,7 @@ def load_aus_and_labels(csv_file):
 
     return X, y
 
-def train_model(X, y, model_file="../../Models/svc_model.pkl", scaler_file="../../Models/scaler.pkl"):
+def train_model(X, y, model_file="../../Models/svc_model_affectnet.pkl", scaler_file="../../Models/scaler_affectnet.pkl"):
     imputer = SimpleImputer(strategy="mean")
     X_imputed = imputer.fit_transform(X)
 
