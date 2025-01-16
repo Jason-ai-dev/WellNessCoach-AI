@@ -7,6 +7,7 @@ from sklearn.metrics import classification_report, accuracy_score
 from scipy.stats import uniform
 import joblib
 
+# Labels for the AffectNet dataset
 LABELS = {
     "0": 0,  # anger
     "1": 1,  # disgust
@@ -17,7 +18,12 @@ LABELS = {
     "6": 6   # neutral
 }
 
-def load_aus_and_labels(csv_file):
+def load_aus_and_labels(csv_file)
+    """
+    Load Action Units and labels from a CSV file.
+    :param csv_file: The path to the CSV file.
+    :return: A tuple containing the Action Units and labels.
+    """
     df = pd.read_csv(csv_file)
 
     if "image_path" not in df.columns or not any(df.filter(like="AU").columns):
@@ -31,14 +37,26 @@ def load_aus_and_labels(csv_file):
     return X, y
 
 def train_model(X, y, model_file="../../Models/svc_model_affectnet.pkl", scaler_file="../../Models/scaler_affectnet.pkl"):
+    """
+    Train an SVC model on the given Action Units and labels.
+    :param X: The Action Units.
+    :param y: The labels.
+    :param model_file: The file to save the trained model to.
+    :param scaler_file: The file to save the scaler to.
+    """
+
+    # Impute missing values
     imputer = SimpleImputer(strategy="mean")
     X_imputed = imputer.fit_transform(X)
 
+    # Scale the data
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X_imputed)
 
+    # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42, stratify=y)
 
+    # Hyperparameter tuning
     param_distributions = {
         "C": uniform(0.1, 10),
         "gamma": uniform(0.001, 1),
@@ -68,11 +86,13 @@ def train_model(X, y, model_file="../../Models/svc_model_affectnet.pkl", scaler_
     print("Classification Report:")
     print(classification_report(y_test, y_pred))
 
+    # Save the model and scaler
     joblib.dump(best_model, model_file)
     joblib.dump(scaler, scaler_file)
     print(f"Model saved to {model_file}")
     print(f"Scaler saved to {scaler_file}")
 
+# Main function
 def main():
     csv_file = "../../AU/large_sample_aus.csv"
 

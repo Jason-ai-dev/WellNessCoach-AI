@@ -12,6 +12,7 @@ FILTERED_CSV_FILE = "../../AU/diffusionFER_aus_no_fear_disgust.csv"
 MODEL_FILE = "../../Models/svc_model_no_fear_disgust_diffusionFER.pkl"
 SCALER_FILE = "../../Models/scaler_no_fear_disgust_diffusionFER.pkl"
 
+# Labels for the DiffusionFER dataset
 LABEL_MAP = {
     "angry": 0,
     "happy": 3,
@@ -21,6 +22,11 @@ LABEL_MAP = {
 }
 
 def load_filtered_data(csv_file):
+    """
+    Load filtered data from a CSV file.
+    :param csv_file: The path to the CSV file.
+    :return: A tuple containing the Action Units and labels.
+    """
     df = pd.read_csv(csv_file)
 
     df["label"] = df["image_path"].apply(lambda path: LABEL_MAP[path.split("\\")[1]])
@@ -31,16 +37,26 @@ def load_filtered_data(csv_file):
     return X, y
 
 def train_svc(X, y):
+    """
+    Train an SVC model on the given Action Units and labels.
+    :param X: The Action Units.
+    :param y: The labels.
+    :return: The trained model and the
+    """
+
+    # Impute missing values
     imputer = SimpleImputer(strategy="mean")
     X_imputed = imputer.fit_transform(X)
 
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X_imputed)
 
+    # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42, stratify=y)
 
     model = SVC(class_weight="balanced", random_state=42)
 
+    # Hyperparameter tuning
     param_distributions = {
         "C": uniform(0.1, 10),
         "gamma": uniform(0.001, 1),
@@ -76,8 +92,8 @@ def train_svc(X, y):
 
     return best_model, scaler
 
+# Main function
 def main():
-    # Load data
     print("Loading filtered data...")
     X, y = load_filtered_data(FILTERED_CSV_FILE)
 

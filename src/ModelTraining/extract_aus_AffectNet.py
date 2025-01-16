@@ -6,6 +6,12 @@ from feat import Detector
 from sklearn.impute import SimpleImputer
 
 def load_dataset(dataset_dir, max_samples_per_class):
+    """
+    Load images from the dataset directory and return a list of image paths and their corresponding labels.
+    :param dataset_dir: The directory containing the dataset.
+    :param max_samples_per_class: The maximum number of samples to load per class.
+    :return: A tuple containing a list of image paths and their corresponding labels.
+    """
     image_paths, labels = [], []
 
     for label in range(7):
@@ -24,6 +30,11 @@ def load_dataset(dataset_dir, max_samples_per_class):
     return image_paths, np.array(labels)
 
 def extract_action_units(image_paths, output_file="../../AU/large_sample_aus.csv"):
+    """
+    Extract Action Units from images and save them to a CSV file.
+    :param image_paths: A list of image paths.
+    :param output_file: The path to save the extracted Action Units.
+    """
     detector = Detector(au_model="svm")
     print("Initialized detector:", detector)
 
@@ -54,6 +65,8 @@ def extract_action_units(image_paths, output_file="../../AU/large_sample_aus.csv
     df.to_csv(output_file, index=False)
     print(f"Action Units saved to {output_file}")
 
+
+# Main function
 def main():
     dataset_dir = "../../affect_net/AffectNet/train"
     max_samples_per_class = 5000
