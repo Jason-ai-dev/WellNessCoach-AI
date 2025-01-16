@@ -18,7 +18,7 @@ LABELS = {
     "6": 6   # neutral
 }
 
-def load_aus_and_labels(csv_file)
+def load_aus_and_labels(csv_file):
     """
     Load Action Units and labels from a CSV file.
     :param csv_file: The path to the CSV file.
