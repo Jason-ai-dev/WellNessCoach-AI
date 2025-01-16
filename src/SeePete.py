@@ -4,7 +4,36 @@ from feat import Detector
 from feat.utils import FEAT_EMOTION_COLUMNS
 from furhat_remote_api import FurhatRemoteAPI
 from multiprocessing import Queue
+import joblib
+from sklearn.impute import SimpleImputer
 
+TEMP_IMAGE_PATH = "temp_frame.jpg"
+
+MODEL_FILE = "../Models/svc_model_affectnet.pkl"
+SCALER_FILE = "../Models/scaler_affectnet.pkl"
+
+model = joblib.load(MODEL_FILE)
+scaler = joblib.load(SCALER_FILE)
+
+EMOTIONS = ["Anger", "Disgust", "Fear", "Happiness", "Sadness", "Surprise", "Neutral"]
+
+def predict_emotion(image_path, detector, model, scaler):
+    try:
+        detections = detector.detect_image(image_path)
+        if not detections.empty:
+            au_features = detections.filter(like="AU").iloc[0].values
+            au_features = au_features.reshape(1, -1)
+
+            imputer = SimpleImputer(strategy="mean")
+            au_features_imputed = imputer.fit_transform(au_features)
+
+            au_features_scaled = scaler.transform(au_features_imputed)
+
+            emotion_index = model.predict(au_features_scaled)[0]
+            return EMOTIONS[emotion_index]
+    except Exception as e:
+        print(f"Error during detection: {e}")
+    return "Unknown"
 
 class SeePete():
 
@@ -38,6 +67,9 @@ class SeePete():
                 faces = self._detector.detect_faces(frame)
                 landmarks = self._detector.detect_landmarks(frame, faces)
                 emotions = self._detector.detect_emotions(frame, faces, landmarks)
+
+                cv2.imwrite(TEMP_IMAGE_PATH, frame)
+                emotion = predict_emotion(TEMP_IMAGE_PATH, self._detector, model, scaler) # TODO: Use this emotion
 
                 # The functions seem to assume a collection of images or frames. We acces "frame 0".
                 faces = faces[0]
