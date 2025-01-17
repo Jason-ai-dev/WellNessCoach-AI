@@ -75,7 +75,8 @@ class SeePete():
 
                 # The functions seem to assume a collection of images or frames. We access "frame 0".
                 faces = faces[0]
-                for (face, emotion) in zip(faces,emotion):
+                temp_string = "hello"
+                for (face, c) in zip(faces,temp_string):
                     (x0, y0, x1, y1, p) = face
 
                 face_loc = ((cam.get(cv2.CAP_PROP_FRAME_WIDTH) / 2 - (x0 + x1) / 2) / cam.get(cv2.CAP_PROP_FRAME_WIDTH),
