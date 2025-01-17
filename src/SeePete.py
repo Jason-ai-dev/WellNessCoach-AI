@@ -17,6 +17,7 @@ scaler = joblib.load(SCALER_FILE)
 
 EMOTIONS = ["Anger", "Disgust", "Fear", "Happiness", "Sadness", "Surprise", "Neutral"]
 
+
 def predict_emotion(image_path, detector, model, scaler):
     try:
         detections = detector.detect_image(image_path)
@@ -30,66 +31,63 @@ def predict_emotion(image_path, detector, model, scaler):
             au_features_scaled = scaler.transform(au_features_imputed)
 
             emotion_index = model.predict(au_features_scaled)[0]
-            return EMOTIONS[emotion_index]
+            emotion = EMOTIONS[emotion_index]
+            with open("output.txt", "w") as f:
+                f.write(emotion)
+            return emotion
     except Exception as e:
         print(f"Error during detection: {e}")
     return "Unknown"
 
-class SeePete():
 
+class SeePete():
     DEPTH_PARAM = 0.3
 
     def __init__(self, logger):
         # self._detector = Detector(device="auto")
-        self._detector = Detector(face_model='faceboxes',emotion_model='resmasknet', landmark_model="pfld", au_model='svm', device='auto')
+        self._detector = Detector(face_model='faceboxes', au_model='svm', device='cpu')
         # self._detector = Detector(face_model='retinaface',emotion_model='svm', landmark_model="mobilenet", au_model='svm', device='auto')
-        au_names = self._detector.info['au_presence_columns']
-        au_names.insert(0, 'face')
-        au_names.insert(0, 'file')
         self._peteSee = FurhatRemoteAPI("localhost")
         self._log = logger
         self._log.info("Starting SeePete")
 
         return
-    
-    def observeUser(self, queue:Queue, pete:FurhatRemoteAPI) -> None:
+
+    def observeUser(self, queue: Queue, pete: FurhatRemoteAPI) -> None:
         cam = cv2.VideoCapture(0)
         cam.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         emo = ""
         old_emo = ""
         while True:
             ret, frame = cam.read()
+            for i in range(10):
+                ret, frame = cam.read()
+
             if not ret:
                 self._log.warning("OpenCV found an error reading the next frame.")
                 break
-            
+
             try:
-                faces = self._detector.detect_faces(frame)
-                landmarks = self._detector.detect_landmarks(frame, faces)
-                emotions = self._detector.detect_emotions(frame, faces, landmarks)
-
                 cv2.imwrite(TEMP_IMAGE_PATH, frame)
-                emotion = predict_emotion(TEMP_IMAGE_PATH, self._detector, model, scaler) # TODO: Use this emotion
+                emotion = predict_emotion(TEMP_IMAGE_PATH, self._detector, model, scaler)  # TODO: Use this emotion
 
-                # The functions seem to assume a collection of images or frames. We acces "frame 0".
+                faces = self._detector.detect_faces(frame)
+
+                # The functions seem to assume a collection of images or frames. We access "frame 0".
                 faces = faces[0]
-                landmarks = landmarks[0]
-                emotions = emotions[0]
-
-                strongest_emotion = emotions.argmax(axis=1)
-
-                for (face, top_emo) in zip(faces, strongest_emotion):
+                for (face, emotion) in zip(faces,emotion):
                     (x0, y0, x1, y1, p) = face
-                    
-                face_loc = ((cam.get(cv2.CAP_PROP_FRAME_WIDTH)/2-(x0+x1)/2)/cam.get(cv2.CAP_PROP_FRAME_WIDTH), 
-                                (cam.get(cv2.CAP_PROP_FRAME_HEIGHT)/2-(y0+y1)/2)/cam.get(cv2.CAP_PROP_FRAME_HEIGHT),
-                                self.DEPTH_PARAM*cam.get(cv2.CAP_PROP_FRAME_HEIGHT)/(max((abs(y1-y0), 0.01,))))
+
+                face_loc = ((cam.get(cv2.CAP_PROP_FRAME_WIDTH) / 2 - (x0 + x1) / 2) / cam.get(cv2.CAP_PROP_FRAME_WIDTH),
+                            (cam.get(cv2.CAP_PROP_FRAME_HEIGHT) / 2 - (y0 + y1) / 2) / cam.get(
+                                cv2.CAP_PROP_FRAME_HEIGHT),
+                            self.DEPTH_PARAM * cam.get(cv2.CAP_PROP_FRAME_HEIGHT) / (max((abs(y1 - y0), 0.01,))))
                 self._log.info(f"looking at: {face_loc}")
                 pete.attend(location=f"{face_loc[0]},{face_loc[1]},{face_loc[2]}")
-                if((emo != FEAT_EMOTION_COLUMNS[top_emo]) and (emo != "") and (FEAT_EMOTION_COLUMNS[top_emo] != old_emo)):
+                if (emo != emotion) and (emo != "") and (emotion != old_emo):
                     old_emo = emo
-                    queue.put(f"emotion|>{emo}->{FEAT_EMOTION_COLUMNS[top_emo]}")
-                emo = FEAT_EMOTION_COLUMNS[top_emo]
+                    queue.put(f"emotion|>{emo}->{emotion}")
+                emo = emotion
                 time.sleep(10)
             except AttributeError:
                 continue
