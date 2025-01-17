@@ -36,6 +36,11 @@ This function wraps the Listening task of Pete
 @param queue Queue for message passing between threads
 '''
 def peteListen(queue:Queue)->None:
+    """
+    Function to listen to the user's question
+    :param queue: Queue object to store the user's question
+    :return: None
+    """
     mlp = ListenPete(logger=logger)
     mlp.listen(queue=queue, pete=furhat)
     return 
@@ -45,6 +50,11 @@ This function wraps the Think and Talk task of Pete
 @param queue Queue for message passing between threads
 '''
 def peteThink(queue:Queue)->None:
+    """
+    Function to think about the user's question and provide a response
+    :param queue: Queue object to store the user's question
+    :return: None
+    """
     mtp = ThinkPete(expert_prompt=expert_prompt, api_key=gem_key, logger=logger)
     mtp.say(queue=queue, pete=furhat)
     return 
@@ -54,6 +64,11 @@ This function wraps the Seeing task of Pete
 @param queue Queue for message passing between threads
 '''
 def peteSee(queue:Queue)->None:
+    """
+    Function to observe the user's facial expressions
+    :param queue: Queue object to store the user's expression
+    :return: None
+    """
     msp = SeePete(logger=logger)
     msp.observeUser(queue=queue, pete=furhat)
     return

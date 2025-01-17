@@ -42,17 +42,18 @@ class SeePete():
         while True:
             # read the image
             ret, frame = cam.read()
+            for i in range(10):
+                ret, frame = cam.read()
+
             if not ret:
                 self._log.warning("OpenCV found an error reading the next frame.")
                 break
-            
+
             try:
                 # Do Py-Feat emotion detection
                 faces = self._detector.detect_faces(frame)
-                landmarks = self._detector.detect_landmarks(frame, faces)
-                emotions = self._detector.detect_emotions(frame, faces, landmarks)
 
-                # The functions seem to assume a collection of images or frames. We acces "frame 0".
+                # The functions seem to assume a collection of images or frames. We access "frame 0".
                 faces = faces[0]
                 landmarks = landmarks[0]
                 emotions = emotions[0]

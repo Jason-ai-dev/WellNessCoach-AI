@@ -114,6 +114,12 @@ class ThinkPete():
     @param pete Furhat API handler for pete
     '''
     def say(self, queue:Queue, pete:FurhatRemoteAPI) -> None:
+        """
+        ThinkPete listens to the user and generates a response using the Gemini API.
+        :param queue: The queue to listen to the user.
+        :param pete: The FurhatRemoteAPI object.
+        :return: None
+        """
         # Have Furhat greet the user
         
         userName = ""
@@ -228,6 +234,12 @@ class ThinkPete():
     @param summary the summary of the discussion.
     '''
     def logUser(self, name:str, summary:str)->None:
+        """
+        Save the user history to a file.
+        :param name: The name of the user.
+        :param summary: The summary of the user history (what was talked about).
+        :return: None
+        """
         userHist = pd.read_csv('userHist.csv')
         self._log.info(f"log user hist: {summary}")
         try:
