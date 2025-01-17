@@ -69,7 +69,7 @@ class SeePete():
 
             try:
                 cv2.imwrite(TEMP_IMAGE_PATH, frame)
-                emotion = predict_emotion(TEMP_IMAGE_PATH, self._detector, model, scaler)  # TODO: Use this emotion
+                emotion = predict_emotion(TEMP_IMAGE_PATH, self._detector, model, scaler)
 
                 faces = self._detector.detect_faces(frame)
 
