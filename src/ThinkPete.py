@@ -5,6 +5,9 @@ import pandas as pd
 
 class ThinkPete():
 
+    """
+    ThinkPete is a class that uses the Gemini API to generate responses to the user.
+    """
     happy_pete = {"frames": [
         {"time":[0.32,0.64],
         "persist":False, 
@@ -96,6 +99,12 @@ class ThinkPete():
         return
 
     def say(self, queue:Queue, pete:FurhatRemoteAPI) -> None:
+        """
+        ThinkPete listens to the user and generates a response using the Gemini API.
+        :param queue: The queue to listen to the user.
+        :param pete: The FurhatRemoteAPI object.
+        :return: None
+        """
         # Have Furhat greet the user
         pete.say(text="hi! what is your name?", blocking=True)
         userName = ""
@@ -136,6 +145,11 @@ class ThinkPete():
             pete.say(text=llm_r.text, blocking=False)
 
     def rememberUser(self, name:str)->str:
+        """
+        Load the user history from a file.
+        :param name: The name of the user.
+        :return: The user history.
+        """
         userHist = pd.read_csv('userHist.csv')
         hist = f"{name} is a new user"
         if((userHist.name == name).any()):
@@ -144,6 +158,12 @@ class ThinkPete():
         return hist
 
     def logUser(self, name:str, summary:str)->None:
+        """
+        Save the user history to a file.
+        :param name: The name of the user.
+        :param summary: The summary of the user history (what was talked about).
+        :return: None
+        """
         userHist = pd.read_csv('userHist.csv')
         self._log.info(f"log user hist: {summary}")
         try:

@@ -4,6 +4,9 @@ from multiprocessing import Queue
 
 class ListenPete():
 
+    """
+    ListenPete is a class that listens to the user and sends the message to the queue.
+    """
     SILENCE_TIME = 7
 
     def __init__(self, logger):

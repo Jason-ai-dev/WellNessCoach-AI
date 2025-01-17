@@ -21,16 +21,31 @@ logging.basicConfig(filename='pete.log', level=logging.INFO)
 
 # mdf = MyDetectFace()
 def peteListen(queue:Queue)->None:
+    """
+    Function to listen to the user's question
+    :param queue: Queue object to store the user's question
+    :return: None
+    """
     mlp = ListenPete(logger=logger)
     mlp.listen(queue=queue, pete=furhat)
     return 
 
 def peteThink(queue:Queue)->None:
+    """
+    Function to think about the user's question and provide a response
+    :param queue: Queue object to store the user's question
+    :return: None
+    """
     mtp = ThinkPete(expert_prompt=expert_prompt, api_key=gem_key, logger=logger)
     mtp.say(queue=queue, pete=furhat)
     return 
 
 def peteSee(queue:Queue)->None:
+    """
+    Function to observe the user's facial expressions
+    :param queue: Queue object to store the user's expression
+    :return: None
+    """
     msp = SeePete(logger=logger)
     msp.observeUser(queue=queue, pete=furhat)
     return
@@ -49,7 +64,7 @@ if __name__ == '__main__':
     users = furhat.get_users()
     furhat.attend(user="CLOSEST")
 
-
+    # Start the processes
     q = Queue()
     p_listen = Process(target=peteListen, args=(q,))
     p_think = Process(target=peteThink, args=(q,))

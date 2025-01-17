@@ -19,6 +19,14 @@ EMOTIONS = ["Anger", "Disgust", "Fear", "Happiness", "Sadness", "Surprise", "Neu
 
 
 def predict_emotion(image_path, detector, model, scaler):
+    """
+    Predict the emotion of a person in an image using the given detector and model.
+    :param image_path: Path to the image file.
+    :param detector: The detector object.
+    :param model: The emotion classification model.
+    :param scaler: The scaler object.
+    :return: The predicted emotion.
+    """
     try:
         detections = detector.detect_image(image_path)
         if not detections.empty:
@@ -41,6 +49,9 @@ def predict_emotion(image_path, detector, model, scaler):
 
 
 class SeePete():
+    """
+    A class to handle the visual observation of a user by Pete.
+    """
     DEPTH_PARAM = 0.3
 
     def __init__(self, logger):
@@ -54,6 +65,12 @@ class SeePete():
         return
 
     def observeUser(self, queue: Queue, pete: FurhatRemoteAPI) -> None:
+        """
+        Observe the user and send the detected emotion to the queue.
+        :param queue: The queue to send the detected emotion to.
+        :param pete: The FurhatRemoteAPI object.
+        :return: None
+        """
         cam = cv2.VideoCapture(0)
         cam.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         emo = ""
@@ -75,16 +92,18 @@ class SeePete():
 
                 # The functions seem to assume a collection of images or frames. We access "frame 0".
                 faces = faces[0]
+                # Work around to fix a last minute bug
                 temp_string = "hello"
                 for (face, c) in zip(faces,temp_string):
                     (x0, y0, x1, y1, p) = face
-
+                # Calculate the location of the face in the camera frame
                 face_loc = ((cam.get(cv2.CAP_PROP_FRAME_WIDTH) / 2 - (x0 + x1) / 2) / cam.get(cv2.CAP_PROP_FRAME_WIDTH),
                             (cam.get(cv2.CAP_PROP_FRAME_HEIGHT) / 2 - (y0 + y1) / 2) / cam.get(
                                 cv2.CAP_PROP_FRAME_HEIGHT),
                             self.DEPTH_PARAM * cam.get(cv2.CAP_PROP_FRAME_HEIGHT) / (max((abs(y1 - y0), 0.01,))))
                 self._log.info(f"looking at: {face_loc}")
                 pete.attend(location=f"{face_loc[0]},{face_loc[1]},{face_loc[2]}")
+                # Only send the emotion if it is different from the previous one
                 if (emo != emotion) and (emo != "") and (emotion != old_emo):
                     old_emo = emo
                     queue.put(f"emotion|>{emo}->{emotion}")

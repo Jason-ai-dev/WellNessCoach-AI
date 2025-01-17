@@ -19,6 +19,11 @@ print("Initialized detector:", detector)
 
 EMOTIONS = ["Anger", "Disgust", "Fear", "Happiness", "Sadness", "Surprise", "Neutral"]
 
+"""
+Script to read webcam feed and predict emotion using the trained model.
+Used for testing the model in real-time.
+"""
+
 def predict_emotion(image_path, detector, model, scaler):
     try:
         detections = detector.detect_image(image_path)
