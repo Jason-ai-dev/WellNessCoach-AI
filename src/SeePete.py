@@ -4,6 +4,7 @@ from feat import Detector
 from feat.utils import FEAT_EMOTION_COLUMNS
 from furhat_remote_api import FurhatRemoteAPI
 from multiprocessing import Queue
+import DetectFace
 
 '''
 The Seeing task
@@ -42,51 +43,62 @@ class SeePete():
         while True:
             # read the image
             ret, frame = cam.read()
-            for i in range(10):
-                ret, frame = cam.read()
-
             if not ret:
                 self._log.warning("OpenCV found an error reading the next frame.")
                 break
+            
+            # try:
+            # Do Py-Feat emotion detection
+            faces = self._detector.detect_faces(frame)
+            landmarks = self._detector.detect_landmarks(frame, faces)
 
-            try:
-                # Do Py-Feat emotion detection
-                faces = self._detector.detect_faces(frame)
+            ## This is the Py-Feat detection
+            # emotions = self._detector.detect_emotions(frame, faces, landmarks)
 
-                # The functions seem to assume a collection of images or frames. We access "frame 0".
-                faces = faces[0]
-                landmarks = landmarks[0]
-                emotions = emotions[0]
+            # The functions seem to assume a collection of images or frames. We access "frame 0".
+            faces = faces[0]
+            # landmarks = landmarks[0]
 
-                strongest_emotion = emotions.argmax(axis=1)
+            ## This is used in Py-Feat
+            # emotions = emotions[0]
+            # strongest_emotion = emotions.argmax(axis=1)
 
-                # here we assume only one user is present in the frame
-                for (face, top_emo) in zip(faces, strongest_emotion):
-                    (x0, y0, x1, y1, p) = face
-                    
-                # calculate the x,y,z values based on the frame infomations and the face box infomations
-                face_loc = ((cam.get(cv2.CAP_PROP_FRAME_WIDTH)/2-(x0+x1)/2)/cam.get(cv2.CAP_PROP_FRAME_WIDTH), 
-                                (cam.get(cv2.CAP_PROP_FRAME_HEIGHT)/2-(y0+y1)/2)/cam.get(cv2.CAP_PROP_FRAME_HEIGHT),
-                                self.DEPTH_PARAM*cam.get(cv2.CAP_PROP_FRAME_HEIGHT)/(max((abs(y1-y0), 0.01,))))
-                self._log.info(f"looking at: {face_loc}")
+            # # here we assume only one user is present in the frame
+            # for (face, top_emo) in zip(faces, strongest_emotion):
+            #     (x0, y0, x1, y1, p) = face
+            
+            ## use of custom model
+            for face in faces:
+                self._log.info(f"SeePete: face {face}.")
+                (x0, y0, x1, y1, p) = face
+            
+            au = self._detector.detect_aus(frame, landmarks)
+            top_emo = DetectFace.predict_emotion(au)
+            self._log.info(f"SeePete: DetectFace.predict_emotion(au) {top_emo}.")
                 
-                # Send attend infomations to Pete
-                pete.attend(location=f"{face_loc[0]},{face_loc[1]},{face_loc[2]}")
-                
-                # Send only the forware emotion changes. 
-                # If the user initially has emotion
-                # A and change it to emotion B, the change will send through the message queue but if the use
-                # changed the emotion from B to A immediately after, this event will not pass.
-                if((emo != FEAT_EMOTION_COLUMNS[top_emo]) and (emo != "") and (FEAT_EMOTION_COLUMNS[top_emo] != old_emo)):
-                    old_emo = emo
-                    queue.put(f"emotion|>{emo}->{FEAT_EMOTION_COLUMNS[top_emo]}")
-                emo = FEAT_EMOTION_COLUMNS[top_emo]
+            # calculate the x,y,z values based on the frame infomations and the face box infomations
+            face_loc = ((cam.get(cv2.CAP_PROP_FRAME_WIDTH)/2-(x0+x1)/2)/cam.get(cv2.CAP_PROP_FRAME_WIDTH), 
+                            (cam.get(cv2.CAP_PROP_FRAME_HEIGHT)/2-(y0+y1)/2)/cam.get(cv2.CAP_PROP_FRAME_HEIGHT),
+                            self.DEPTH_PARAM*cam.get(cv2.CAP_PROP_FRAME_HEIGHT)/(max((abs(y1-y0), 0.01,))))
+            self._log.info(f"looking at: {face_loc}")
+            
+            # Send attend infomations to Pete
+            pete.attend(location=f"{face_loc[0]},{face_loc[1]},{face_loc[2]}")
+            
+            # Send only the forware emotion changes. 
+            # If the user initially has emotion
+            # A and change it to emotion B, the change will send through the message queue but if the use
+            # changed the emotion from B to A immediately after, this event will not pass.
+            if((emo != FEAT_EMOTION_COLUMNS[top_emo]) and (emo != "") and (FEAT_EMOTION_COLUMNS[top_emo] != old_emo)):
+                old_emo = emo
+                queue.put(f"emotion|>{emo}->{FEAT_EMOTION_COLUMNS[top_emo]}")
+            emo = FEAT_EMOTION_COLUMNS[top_emo]
 
-                # This sleep is needed to avoid filling the message queue with facial emotion info
-                time.sleep(2)
-            except AttributeError:
-                # skip if face is not detected 
-                self._log.info("SeePete: face not detected.")
-                continue
+            # This sleep is needed to avoid filling the message queue with facial emotion info
+            time.sleep(2)
+            # except AttributeError:
+            #     # skip if face is not detected 
+            #     self._log.info("SeePete: face not detected.")
+            #     continue
 
         cam.release()
